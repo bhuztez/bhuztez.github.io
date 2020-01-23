@@ -1,19 +1,15 @@
-================
-用gcj编译SWT程序
-================
-
-:date: 2013-01-02
-:slug: compiling-swt-application-with-gcj
-:tags: SWT, Java, How-to
+Title: 用gcj编译SWT程序
+Date: 2013-01-02
+Slug: compiling-swt-application-with-gcj
+Tag: SWT
 
 很久之前编译成功过一次，忘了记下编译用的参数，之后就再也想不起来了。现在重新编译一次，把用到的参数记录一下。
 
-.. more
+<!-- more -->
 
-gcj可以把Java程序编译成本地指令集。比如下面这个程序，\ :code:`gcj -s -o SwingHelloWorld --main=SwingHelloWorld -Os SwingHelloWorld.java`\ 就可以了。运行再关掉，可以明显的感觉到比用JVM快了一点。
+gcj可以把Java程序编译成本地指令集。比如下面这个程序，`gcj -s -o SwingHelloWorld --main=SwingHelloWorld -Os SwingHelloWorld.java`就可以了。运行再关掉，可以明显的感觉到比用JVM快了一点。
 
-.. code:: java
-
+    :::java
     import java.awt.FlowLayout;
     import javax.swing.JFrame;
     import javax.swing.JLabel;
@@ -33,8 +29,7 @@ gcj可以把Java程序编译成本地指令集。比如下面这个程序，\ :c
 
 SWT程序的编译过程略有不同，以下面这个程序为例
 
-.. code:: java
-
+    :::java
     import org.eclipse.swt.SWT;
     import org.eclipse.swt.widgets.Display;
     import org.eclipse.swt.widgets.Shell;
@@ -61,26 +56,23 @@ SWT程序的编译过程略有不同，以下面这个程序为例
         }
     }
 
-需要先编译\ :code:`swt.jar`\ ，注意要加上\ :code:`-fjni`\ 参数
+需要先编译`swt.jar`，注意要加上`-fjni`参数
 
-.. code:: console
-
+    :::console
     $ gcj -s -Os -shared -fjni -fPIC -o libswt.so /usr/lib64/java/swt.jar
     $ gcj -s -Os --classpath=/usr/lib64/java/swt.jar -o SWTHelloWorld --main=SWTHelloWorld SWTHelloWorld.java -lswt -L.
     $ LD_LIBRARY_PATH=. ./SWTHelloWorld
 
-也可以静态链接\ :code:`swt.jar`
+也可以静态链接`swt.jar`
 
-.. code:: console
-
+    :::console
     $ gcj -Os -c -fjni -o swt.o /usr/lib64/java/swt.jar
     $ gcj -s -o SWTHelloWorld -Os --classpath=/usr/lib64/java/swt.jar --main=SWTHelloWorld SWTHelloWorld.java swt.o
     $ ./SWTHelloWorld
 
-要在\ :code:`gij`\ 里用上预先编译好的SWT，编译SWT时需要加上\ :code:`-findirect-dispatch -Wl,-Bsymbolic`\ 。运行\ :code:`gij`\ 时加上\ :code:`-verbose:class`\ 可以检查是否用上了预先编译好的SWT。参考\ `How to BC compile with GCJ <http://gcc.gnu.org/wiki/How_to_BC_compile_with_GCJ>`_
+要在`gij`里用上预先编译好的SWT，编译SWT时需要加上`-findirect-dispatch -Wl,-Bsymbolic`。运行`gij`时加上`-verbose:class`可以检查是否用上了预先编译好的SWT。参考[How to BC compile with GCJ](http://gcc.gnu.org/wiki/How_to_BC_compile_with_GCJ)
 
-.. code:: console
-
+    :::console
     $ gcj -s -Os -shared -fjni -fPIC -findirect-dispatch -Wl,-Bsymbolic -o libswt.so /usr/lib64/java/swt.jar
 
     $ gcj-dbtool -n swt.db
