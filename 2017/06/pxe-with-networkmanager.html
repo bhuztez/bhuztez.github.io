@@ -1,0 +1,87 @@
+
+<!doctype html>
+<html>
+<head>
+<title>
+基于NetworkManager配置PXE Server
+ -
+lasciate ogni speranza, voi ch'entrate</title>
+<link rel="stylesheet" href="/static/base.css" type="text/css" />
+</head>
+<body>
+<header>
+<h1>lasciate ogni speranza, voi ch'entrate</h1>
+<nav>
+<ul>
+<li>
+<a href="/">Home</a>
+</li>
+<li>
+<a href="/project.html">Projects</a>
+</li>
+<li>
+<a href="/quotes.html">Quotes</a>
+</li>
+</ul>
+</nav>
+</header>
+
+<main>
+<article>
+<h2>基于NetworkManager配置PXE Server</h2>
+
+2017-06-11
+
+<aside>
+<span class="tag">PXE</span>
+
+<span class="tag">NetworkManager</span>
+
+</aside>
+
+<p>现在常见的Linux发行版，桌面网络都是用NetworkManager管的。Fedora Installation Guide里的方法<sup id="fnref:#"><a class="footnote-ref" href="#fn:#">1</a></sup>并不适用。</p>
+<!-- more -->
+
+<p>在NetworkManager里的IPv4 Settings设置Method为Shared to Other Computers，就会启动dnsmasq，里面已经有DHCP server了，所以并不需要额外运行dhcpd。只需要在<code>/etc/NetworkManager/dnsmasq-shared.d/</code>下添加一个配置文件就可以了</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="n">server</span><span class="o">=</span><span class="mi">127</span><span class="p">.</span><span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">.</span><span class="mi">1</span>
+<span class="n">dhcp</span><span class="o">-</span><span class="k">match</span><span class="o">=</span><span class="k">set</span><span class="p">:</span><span class="n">efi</span><span class="o">-</span><span class="n">x86_64</span><span class="p">,</span><span class="k">option</span><span class="p">:</span><span class="n">client</span><span class="o">-</span><span class="n">arch</span><span class="p">,</span><span class="mi">7</span>
+<span class="n">dhcp</span><span class="o">-</span><span class="n">boot</span><span class="o">=</span><span class="n">tag</span><span class="p">:</span><span class="n">efi</span><span class="o">-</span><span class="n">x86_64</span><span class="p">,</span><span class="n">shim</span><span class="p">.</span><span class="n">efi</span>
+</pre></div>
+</td></tr></table>
+
+<p>而在<code>/var/lib/tftpboot</code>目录下，应该使用这样的目录结构，不然根本就找不到grub.cfg，并且文件复制进去之后要restorecon，不然SELinux会阻止tftp-server读取里面的文件。</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="n">EFI</span><span class="o">/</span>
+  <span class="n">fedora</span><span class="o">/</span>
+    <span class="n">grub</span><span class="p">.</span><span class="n">cfg</span>
+<span class="n">f25</span><span class="o">/</span>
+  <span class="n">vmlinuz</span>
+  <span class="n">initrd</span><span class="p">.</span><span class="n">img</span>
+<span class="n">shim</span><span class="p">.</span><span class="n">efi</span>
+<span class="n">grubx64</span><span class="p">.</span><span class="n">efi</span>
+</pre></div>
+</td></tr></table>
+
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn:#">
+<p>https://docs.fedoraproject.org/en-US/Fedora/25/html/Installation_Guide/chap-pxe-server-setup.html&#160;<a class="footnote-backref" href="#fnref:#" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+</article>
+
+</main>
+
+
+</body>
+</html>

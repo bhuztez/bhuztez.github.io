@@ -1,0 +1,61 @@
+
+<!doctype html>
+<html>
+<head>
+<title>
+在Fedora 12上用WINE运行QQ 2009
+ -
+lasciate ogni speranza, voi ch'entrate</title>
+<link rel="stylesheet" href="/static/base.css" type="text/css" />
+</head>
+<body>
+<header>
+<h1>lasciate ogni speranza, voi ch'entrate</h1>
+<nav>
+<ul>
+<li>
+<a href="/">Home</a>
+</li>
+<li>
+<a href="/project.html">Projects</a>
+</li>
+<li>
+<a href="/quotes.html">Quotes</a>
+</li>
+</ul>
+</nav>
+</header>
+
+<main>
+<article>
+<h2>在Fedora 12上用WINE运行QQ 2009</h2>
+
+2010-12-09
+
+<aside>
+<span class="tag">Fedora</span>
+
+<span class="tag">QQ</span>
+
+</aside>
+
+<p>QQ 2009以前的版本，用从网上找来的方法，把QQ用WINE运行起来并没有什么问题。自从QQ 2009开始，出现了一个问题，一点输入密码的框程序就会崩溃，也就是完全不能登录。</p>
+<!-- more -->
+
+<p>首先用winetricks安装必要的库<code>winetricks gdiplus flash ie6 msxml3 riched20 riched30 vcrun6 vcrun2005</code>。字体问题，在<code>HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\FontSubstitutes</code>下，把<code>MS Shell Dlg</code>，<code>MS Shell Dlg 2</code>以及<code>Tahoma</code>都设置变成<code>SimSun</code>，并把<code>simsun.ttc</code>放到<code>WINEPREFIX/drive_c/windows/Fonts/</code>目录下。</p>
+<p>干净安装好第一次运行，密码框并不会崩溃。发现是因为<code>Bin/tssafeedit.dat</code>更新了之后才会崩溃的，于是可以把原始文件保存一下，运行完了再替换回去，这样密码框就不会崩溃了。同时QQ自动更新的那个框是运行<code>Bin/auclt.exe</code>弹出来的，直接把这个文件删了，就不会了。</p>
+<p>写了个脚本，来自动执行上面这些步骤</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="gp">$</span> wget <span class="s1">&#39;https://github.com/bhuztez/configs-and-scripts/raw/master/fedora-wine-qq.sh&#39;</span>
+<span class="gp">$</span> chmod u+x fedora-wine-qq.sh
+<span class="gp">$</span> ./fedora-wine-qq.sh
+</pre></div>
+</td></tr></table>
+</article>
+
+</main>
+
+
+</body>
+</html>

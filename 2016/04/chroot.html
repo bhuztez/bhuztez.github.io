@@ -1,0 +1,70 @@
+
+<!doctype html>
+<html>
+<head>
+<title>
+创建Fedora chroot
+ -
+lasciate ogni speranza, voi ch'entrate</title>
+<link rel="stylesheet" href="/static/base.css" type="text/css" />
+</head>
+<body>
+<header>
+<h1>lasciate ogni speranza, voi ch'entrate</h1>
+<nav>
+<ul>
+<li>
+<a href="/">Home</a>
+</li>
+<li>
+<a href="/project.html">Projects</a>
+</li>
+<li>
+<a href="/quotes.html">Quotes</a>
+</li>
+</ul>
+</nav>
+</header>
+
+<main>
+<article>
+<h2>创建Fedora chroot</h2>
+
+2016-04-08
+
+<aside>
+<span class="tag">Fedora</span>
+
+</aside>
+
+<p>在Fedora 21之前，要创建chroot都比较容易，可以参考<a href="http://blog.parahard.com/2011/06/five-steps-to-create-fedora-chroot-jail.html">Five steps to create Fedora chroot jail using yum</a></p>
+<!-- more -->
+
+<p>自从Fedora 21开始，fedora-release不再像以前那样了。fedora-release会依赖bash，bash又会依赖更多包，一个个去找过来是不现实的。所以只能强制安装了。</p>
+<p>先建好目录，初始化RPM的db</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="gp">$</span> mkdir -p /path/to/chroot/root
+<span class="gp">$</span> rpm --root <span class="s2">&quot;/path/to/chroot/root&quot;</span> --initdb
+</pre></div>
+</td></tr></table>
+
+<p>装包时，需要让rpm相信自己是root。比如可以用<code>userns spawn -n chroot --user -- /bin/bash</code>来建一个user namespace，因为安装需要联网，所以不建新的network namespace。更新的Fedora已经用dnf替换yum了，所以更推荐使用dnf来安装。</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="gp">$</span> rpm -ivh --nodeps --root <span class="s2">&quot;/path/to/chroot/root&quot;</span> fedora-repos-23-1.noarch.rpm fedora-release-23-1.noarch.rpm
+<span class="gp">$</span> dnf --installroot<span class="o">=</span><span class="s2">&quot;/path/to/chroot/root&quot;</span> install coreutils bash
+</pre></div>
+</td></tr></table>
+
+<p>安装完成后，就可以进入chroot了</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="gp">$</span> chroot <span class="s2">&quot;/path/to/chroot/root&quot;</span> /bin/bash
+</pre></div>
+</td></tr></table>
+
+<p>不知道为什么，最近的DNF事实上并不需要初始化RPM的db，直接install就可以了。</p>
+</article>
+
+</main>
+
+
+</body>
+</html>

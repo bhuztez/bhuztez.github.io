@@ -1,0 +1,122 @@
+
+<!doctype html>
+<html>
+<head>
+<title>
+Python模拟HTML表单提交
+ -
+lasciate ogni speranza, voi ch'entrate</title>
+<link rel="stylesheet" href="/static/base.css" type="text/css" />
+</head>
+<body>
+<header>
+<h1>lasciate ogni speranza, voi ch'entrate</h1>
+<nav>
+<ul>
+<li>
+<a href="/">Home</a>
+</li>
+<li>
+<a href="/project.html">Projects</a>
+</li>
+<li>
+<a href="/quotes.html">Quotes</a>
+</li>
+</ul>
+</nav>
+</header>
+
+<main>
+<article>
+<h2>Python模拟HTML表单提交</h2>
+
+2016-06-30
+
+<aside>
+<span class="tag">Python</span>
+
+</aside>
+
+<p>HTML表单里有一种类型是<code>multipart/form-data</code>，Python的urllib并不支持。搜了一下结果发现要么是远古时期的，要么推荐用requests，就是没有人推荐用标准库的方法。Python自带了MIME库，用标准库就足够了。</p>
+<!-- more -->
+
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">urllib2</span> <span class="kn">import</span> <span class="n">Request</span>
+<span class="kn">from</span> <span class="nn">email.message</span> <span class="kn">import</span> <span class="n">Message</span>
+
+
+<span class="k">class</span> <span class="nc">Form</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Message</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_header</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s1">&#39;multipart/form-data&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_payload</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">_write_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_generator</span><span class="p">):</span>
+        <span class="c1"># DARK MAGIC followed</span>
+        <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">Field</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">text</span><span class="p">):</span>
+        <span class="n">Message</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_header</span><span class="p">(</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">,</span><span class="s1">&#39;form-data&#39;</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_payload</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">make_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="n">form_data</span><span class="p">):</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">Form</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">form_data</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">Field</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">as_string</span><span class="p">()</span>
+    <span class="c1"># THIS IS A SEPARATION BARRIER</span>
+    <span class="c1"># NEVER LET CODE MOVE ACROSS THIS</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">[</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">]}</span>
+
+    <span class="k">return</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">headers</span><span class="p">)</span>
+</pre></div>
+</td></tr></table>
+</article>
+
+</main>
+
+
+</body>
+</html>

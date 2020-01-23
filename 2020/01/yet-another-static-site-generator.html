@@ -1,0 +1,72 @@
+
+<!doctype html>
+<html>
+<head>
+<title>
+又双叒叕造了一个静态网页生成工具
+ -
+lasciate ogni speranza, voi ch'entrate</title>
+<link rel="stylesheet" href="/static/base.css" type="text/css" />
+</head>
+<body>
+<header>
+<h1>lasciate ogni speranza, voi ch'entrate</h1>
+<nav>
+<ul>
+<li>
+<a href="/">Home</a>
+</li>
+<li>
+<a href="/project.html">Projects</a>
+</li>
+<li>
+<a href="/quotes.html">Quotes</a>
+</li>
+</ul>
+</nav>
+</header>
+
+<main>
+<article>
+<h2>又双叒叕造了一个静态网页生成工具</h2>
+
+2020-01-22
+
+<aside>
+<a class="tag" href="/elaphure.html">elaphure</a>
+</aside>
+
+<p>早期所谓的共享空间，就只有个FTP供你上传静态网页。后来随着PHP成为了最好
+的编程语言，很多之前很火的静态网页生成工具都销声匿迹了。谁又能料到，
+2008年GitHub推出了Pages功能，静态网页生成工具卷土重来。时至今日，据
+<a href="https://staticsitegenerators.net">Static Site Generators</a>的不完全统计，
+已经有460了。</p>
+<!-- more -->
+
+<p>虽然有这么多，然而换来换去，竟然找不到一个比较好用的，都有这样或者那样
+的问题。我想我的要求并不高，也就这么几条</p>
+<ul>
+<li>文件修改之后，在本地预览是可以立即看到变化的，而不是需要重新生成所有HTML，或者页面只有一部分会变</li>
+<li>方便配置，而不是随便加点功能都要写个插件</li>
+</ul>
+<p>怪不得轮子哥要说Shopping is hard, lemme reinvent the wheel.</p>
+<p>曾有一段时间不自量力的认为，可以写一个增量更新的工具来解决这个问题。然
+而花了好久也没写出来。后来反思了一下，重复发明轮子的重点是重复而不是发
+明。</p>
+<p>既然如此，直接用生成动态网页的库就好了，需要补的仅仅是</p>
+<ul>
+<li>怎么找出URL routing里一条规则所有可能的参数</li>
+<li>文件发生变化时自动更新数据库</li>
+</ul>
+<p>前者只需要要求每个view都提供find_all。而后者可以用
+<a href="https://pypi.org/project/watchdog/">watchdog</a>办到。</p>
+<p>因为sqlite早就支持JSON了，所以每个文件的metadata都以JSON格式存到sqlite
+里。可是Python自带的sqlite版本要么太老，要么没打开JSON1，所以最后花了
+很多时间在<a href="/sqlite3ct.html">sqlite3ct</a>上。</p>
+</article>
+
+</main>
+
+
+</body>
+</html>

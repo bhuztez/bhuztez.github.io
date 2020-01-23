@@ -1,0 +1,54 @@
+
+<!doctype html>
+<html>
+<head>
+<title>
+在Fedora上继续使用GRUB
+ -
+lasciate ogni speranza, voi ch'entrate</title>
+<link rel="stylesheet" href="/static/base.css" type="text/css" />
+</head>
+<body>
+<header>
+<h1>lasciate ogni speranza, voi ch'entrate</h1>
+<nav>
+<ul>
+<li>
+<a href="/">Home</a>
+</li>
+<li>
+<a href="/project.html">Projects</a>
+</li>
+<li>
+<a href="/quotes.html">Quotes</a>
+</li>
+</ul>
+</nav>
+</header>
+
+<main>
+<article>
+<h2>在Fedora上继续使用GRUB</h2>
+
+2014-10-19
+
+<aside>
+<span class="tag">Fedora</span>
+
+<span class="tag">GRUB</span>
+
+</aside>
+
+<p>Fedora从某个版本开始默认使用GRUB2了。实在搞不明白无比复杂的GRUB2，还是继续用GRUB吧。可是没过多久fedora-logos里都不带GRUB的背景图了，只好果断抛弃，用generic-logos。另外还在<code>/etc/yum.conf</code>里把GRUB2什么的统统禁掉，免得distro-sync完了以后GRUB没了。</p>
+<!-- more -->
+
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="n">exclude</span><span class="o">=</span><span class="n">grub2</span> <span class="n">grub</span><span class="o">-</span><span class="n">efi</span> <span class="n">grub2</span><span class="o">-</span><span class="n">efi</span>
+</pre></div>
+</td></tr></table>
+</article>
+
+</main>
+
+
+</body>
+</html>

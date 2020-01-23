@@ -1,0 +1,109 @@
+
+<!doctype html>
+<html>
+<head>
+<title>
+编写pppd插件
+ -
+lasciate ogni speranza, voi ch'entrate</title>
+<link rel="stylesheet" href="/static/base.css" type="text/css" />
+</head>
+<body>
+<header>
+<h1>lasciate ogni speranza, voi ch'entrate</h1>
+<nav>
+<ul>
+<li>
+<a href="/">Home</a>
+</li>
+<li>
+<a href="/project.html">Projects</a>
+</li>
+<li>
+<a href="/quotes.html">Quotes</a>
+</li>
+</ul>
+</nav>
+</header>
+
+<main>
+<article>
+<h2>编写pppd插件</h2>
+
+2008-11-06
+
+<aside>
+<span class="tag">PPP</span>
+
+</aside>
+
+<p>pppd关于插件的说明，只有代码树最顶上那个<code>PLUGINS</code>文件。按里面的说法，先<code>yum install ppp-devel</code>，在C代码中加上<code>#include &lt;pppd/pppd.h&gt;</code>和<code>char pppd_version[] = VERSION;</code>以确保plugin能被pppd使用，就可以了。</p>
+<!-- more -->
+
+<p>然而，有些需要注意的地方在里面并没有提到，得看现成的插件代码才知道是怎么回事。比如<code>pad_passwd_hook</code>，是会被多次调用的，而且第一次调用时，<code>passwd</code>参数是个空指针。假如你的插件需要修改用户名，你还需要自行判断之前有没有修改过。以下是参考代码</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="k">static</span> <span class="kt">char</span> <span class="n">pwd</span><span class="p">[</span><span class="n">MAXSECRETLEN</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="n">is_name_modified</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="k">static</span> <span class="n">option_t</span> <span class="n">options</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span> <span class="s">&quot;pwd&quot;</span><span class="p">,</span> <span class="n">o_string</span><span class="p">,</span> <span class="n">pwd</span><span class="p">,</span>
+      <span class="s">&quot;pwd&quot;</span><span class="p">,</span>
+      <span class="n">OPT_STATIC</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">MAXSECRETLEN</span><span class="o">-</span><span class="mi">1</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nb">NULL</span> <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="k">static</span> <span class="kt">int</span>
+<span class="nf">get_credentials</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">user</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">passwd</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">is_name_modified</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">modify</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+        <span class="n">is_name_modified</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">passwd</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">strcpy</span><span class="p">(</span><span class="n">passwd</span><span class="p">,</span> <span class="n">pwd</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="nf">plugin_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">add_options</span><span class="p">(</span><span class="n">options</span><span class="p">);</span>
+    <span class="n">pap_passwd_hook</span> <span class="o">=</span> <span class="n">get_credentials</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table>
+</article>
+
+</main>
+
+
+</body>
+</html>
